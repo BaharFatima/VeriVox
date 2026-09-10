@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+websockets
+torch
+torchaudio
+transformers
+librosa
+numpy
+pydantic
