@@ -1,7 +1,5 @@
 {
   "name": "verivox",
   "version": "1.0.0",
-  "scripts": {
-    "dev": "npx serve ."
-  }
+  "private": true
 }
