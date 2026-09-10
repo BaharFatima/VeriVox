@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F4072">
+  <meta name="description" content="VoxSentinel real-time voice intelligence dashboard">
+  <title>VoxSentinel | Live Guard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◇</span><span>Vox<span>Sentinel</span></span></div>
+      <div class="workspace"><span class="avatar small">AC</span><span><small>Workspace</small><strong>Acme Corp</strong></span><span class="chevron">⌄</span></div>
+      <nav class="side-nav" aria-label="Primary navigation">
+        <p>Monitor</p><a class="nav-item active" href="#live-guard"><span>▣</span>Live Guard<i></i></a><a class="nav-item" href="#analytics"><span>▥</span>Analytics</a>
+        <p>Investigate</p><a class="nav-item" href="#soar"><span>☷</span>SOAR Rules</a><a class="nav-item" href="#baselines"><span>◎</span>Voice Baselines</a><a class="nav-item" href="#forensics"><span>⌕</span>Forensics</a>
+      </nav>
+      <div class="sidebar-bottom"><a class="nav-item" href="#team"><span>♧</span>Team</a><a class="nav-item" href="#help"><span>?</span>Help center</a><div class="user-row"><span class="avatar">JD</span><span><strong>Jordan Davis</strong><small>Security lead</small></span><span>•••</span></div></div>
+    </aside>
+
+    <section class="content" id="live-guard">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark">◇</span><strong>VoxSentinel</strong></div><div class="top-actions"><span class="system-status"><i></i>All systems operational</span><button class="icon-button" aria-label="Notifications">♢<b></b></button><button class="icon-button menu-button" aria-label="Menu">☰</button><span class="avatar top-avatar">JD</span></div></header>
+      <div class="page-body">
+        <div class="page-heading"><div><div class="eyebrow"><i></i>INTERCEPTION ACTIVE <span>/</span> LATENCY: &lt;50MS</div><h1>Live Guard</h1><p>Real-time voice intelligence for every conversation.</p></div><div class="heading-actions"><a class="secondary-button" href="#controls">◉ Pause monitor</a><a class="primary-button" href="#baselines">✦ New baseline</a></div></div>
+        <div class="alert-strip" role="status"><span class="alert-icon">◉</span><div><strong>Monitoring is active</strong><span>Incoming streams are being analyzed across all voice channels.</span></div><span class="close">×</span></div>
+        <div class="dashboard-grid">
+          <section class="panel risk-panel"><div class="panel-header"><div><span class="section-kicker">CURRENT SESSION</span><h2>Risk overview</h2></div><span class="more">•••</span></div><div class="risk-content"><div class="score-ring"><div><strong>0.18</strong><span>Bayesian spoof score</span></div></div><div class="risk-copy"><span class="status-pill"><i></i>Low risk</span><h3>Conversation appears authentic</h3><p>All models are in agreement. No synthetic voice markers detected in the current session.</p><div class="mini-stat"><span>Confidence</span><strong>91.4%</strong><div class="meter"><i></i></div></div></div></div><div class="risk-footer"><span>▣ Session encrypted</span><span>⌁ WebRTC connected</span><span>Updated just now</span></div></section>
+          <section class="panel call-panel"><div class="panel-header"><div><span class="section-kicker">ACTIVE CALL</span><h2>Voice stream</h2></div><span class="live-badge"><i></i>LIVE</span></div><div class="caller"><span class="caller-avatar">◉</span><div><h3>Unknown caller</h3><p>+1 (415) 555-0182 <span>·</span> San Francisco, CA</p></div><span class="more">•••</span></div><div class="wave-wrap"><div class="wave-top"><span>INCOMING AUDIO</span><span>♩ OPUS · 48KHZ</span></div><div class="waveform" aria-label="Live audio waveform">||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</div><div class="wave-time"><span>00:42</span><span>02:18</span></div></div><div class="call-meta"><div><small>STREAM</small><strong><i></i> RTP / WebRTC</strong></div><div><small>ENCRYPTION</small><strong>▣ SRTP</strong></div><div><small>CHANNEL</small><strong>PBX · 04</strong></div></div><a class="sever-button" href="#live-guard">☎ Sever connection</a></section>
+          <section class="panel models-panel" id="analytics"><div class="panel-header"><div><span class="section-kicker">MULTI-MODEL ANALYSIS</span><h2>Signal intelligence</h2></div><a class="view-link" href="#analytics">View analytics →</a></div><div class="model-list"><div class="model-row"><span class="model-icon">✦</span><span class="model-name"><strong>AASIST attention</strong><small>Temporal + spectral</small></span><span class="model-score"><strong>0.18</strong><small>Low risk</small></span><span class="score-bar"><i style="width:18%"></i></span></div><div class="model-row"><span class="model-icon">✦</span><span class="model-name"><strong>SSL fusion</strong><small>WavLM · HuBERT</small></span><span class="model-score"><strong>0.24</strong><small>Low risk</small></span><span class="score-bar"><i style="width:24%"></i></span></div><div class="model-row"><span class="model-icon">✦</span><span class="model-name"><strong>Bispectrum</strong><small>Phase coupling</small></span><span class="model-score"><strong>0.31</strong><small>Low risk</small></span><span class="score-bar"><i style="width:31%"></i></span></div><div class="model-row"><span class="model-icon">✦</span><span class="model-name"><strong>Acoustic baseline</strong><small>Cosine similarity</small></span><span class="model-score"><strong>0.09</strong><small>Verified</small></span><span class="score-bar"><i style="width:9%"></i></span></div></div><div class="models-foot"><span>◌ 4 models synchronized</span><span>Last inference 120ms ago</span></div></section>
+          <section class="panel controls-panel" id="controls"><div class="panel-header"><div><span class="section-kicker">AUTOMATION</span><h2>Response controls</h2></div><a class="view-link" href="#soar">Manage rules →</a></div><div class="control-list"><div class="control-row"><span class="control-leading"><span class="control-icon amber">!</span><span><strong>Elevated risk alerts</strong><small>Notify your security team</small></span></span><span class="toggle on"><i></i></span></div><div class="control-row"><span class="control-leading"><span class="control-icon blue">⌁</span><span><strong>Auto-create cases</strong><small>Open a case above 0.70</small></span></span><span class="toggle on"><i></i></span></div><div class="control-row"><span class="control-leading"><span class="control-icon green">◇</span><span><strong>Force connection drop</strong><small>Critical spoof threshold</small></span></span><span class="toggle on"><i></i></span></div></div></section>
+        </div>
+        <div class="bottom-note"><span>◇ Protected by VoxSentinel inference engine</span><span>Data processed in-region · SOC 2 Type II</span></div>
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class="active" href="#live-guard">▣<span>Live Guard</span></a><a href="#analytics">▥<span>Analytics</span></a><a href="#soar">☷<span>SOAR Rules</span></a><a href="#baselines">◎<span>Baselines</span></a><a href="#forensics">⌕<span>Forensics</span></a></nav>
+    </section>
+  </main>
+</body>
+</html>
