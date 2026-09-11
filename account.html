@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F4072">
+  <meta name="description" content="VeriVox real-time voice intelligence dashboard">
+  <title>VeriVox · Account</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◇</span><span>Veri<span>Vox</span></span></div>
+      <div class="workspace"><span class="avatar small">AC</span><span><small>Workspace</small><strong>Acme Corp</strong></span><span class="chevron">⌄</span></div>
+      <nav class="side-nav" aria-label="Primary navigation">
+        <p>Monitor</p><a class="nav-item" href="index.html"><span>▣</span>Live Guard<i></i></a><a class="nav-item" href="analytics.html"><span>▥</span>Analytics</a>
+        <p>Investigate</p><a class="nav-item" href="soar-rules.html"><span>☷</span>SOAR Rules</a><a class="nav-item" href="voice-baselines.html"><span>◎</span>Voice Baselines</a><a class="nav-item" href="forensics.html"><span>⌕</span>Forensics</a>
+      </nav>
+      <div class="sidebar-bottom"><a class="nav-item active" href="account.html"><span>♤</span>Account</a><a class="nav-item" href="#help"><span>?</span>Help center</a><div class="user-row"><span class="avatar">JD</span><span><strong>Jordan Davis</strong><small>Security lead</small></span><span>•••</span></div></div>
+    </aside>
+    <section class="content" id="account">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark">◇</span><strong>VeriVox</strong></div><div class="top-actions"><span class="system-status"><i></i>All systems operational</span><button class="icon-button" aria-label="Notifications">♢<b></b></button><button class="icon-button menu-button" aria-label="Menu">☰</button><a href="account.html" class="avatar top-avatar" style="text-decoration:none;display:grid;place-items:center;color:var(--butter)">JD</a></div></header>
+      <div class="page-body">
+        <div class="page-heading"><div><div class="eyebrow"><i></i>WORKSPACE</div><h1>Account</h1><p>Manage your profile, alerts, and this workspace.</p></div><div class="heading-actions"></div></div>
+        
+<div class="dashboard-grid">
+  <section class="panel" style="grid-column:1/-1"><div class="panel-header"><div><span class="section-kicker">PROFILE</span><h2>Your details</h2></div></div>
+    <div style="padding:5px 22px 22px">
+      <div class="form-grid">
+        <div class="form-field"><label>Full name</label><input id="accName"></div>
+        <div class="form-field"><label>Role</label><input id="accRole"></div>
+        <div class="form-field"><label>Email</label><input id="accEmail" type="email"></div>
+        <div class="form-field"><label>Organization</label><input id="accOrg"></div>
+      </div>
+      <div class="form-actions"><button class="primary-button" id="accSave">Save changes</button></div>
+    </div>
+  </section>
+
+  <section class="panel controls-panel"><div class="panel-header"><div><span class="section-kicker">NOTIFICATIONS</span><h2>Alert preferences</h2></div></div><div class="control-list">
+    <div class="control-row"><span class="control-leading"><span class="control-icon amber">✉</span><span><strong>Email alerts</strong><small>Elevated risk &amp; case updates</small></span></span><span class="toggle" id="toggleEmail"><i></i></span></div>
+    <div class="control-row"><span class="control-leading"><span class="control-icon blue">☏</span><span><strong>SMS alerts</strong><small>Critical spoof events only</small></span></span><span class="toggle" id="toggleSms"><i></i></span></div>
+    <div class="control-row"><span class="control-leading"><span class="control-icon green">▥</span><span><strong>Weekly digest</strong><small>Summary of monitored sessions</small></span></span><span class="toggle" id="toggleDigest"><i></i></span></div>
+  </div></section>
+
+  <section class="panel controls-panel"><div class="panel-header"><div><span class="section-kicker">APPEARANCE</span><h2>Workspace</h2></div></div>
+    <div style="padding:5px 22px 22px">
+      <div class="form-field full" style="margin-bottom:14px"><label>Workspace name</label><input id="accWorkspace" value="Acme Corp"></div>
+      <div class="control-row" style="border:0;padding-top:0"><span class="control-leading"><span class="control-icon blue">◐</span><span><strong>Dark mode</strong><small>Applies across VeriVox</small></span></span><span class="toggle" id="toggleTheme"><i></i></span></div>
+    </div>
+  </section>
+
+  <section class="panel" style="grid-column:1/-1;border-color:#e2b9b4"><div class="panel-header"><div><span class="section-kicker" style="color:#a6362f">DANGER ZONE</span><h2>Session &amp; local data</h2></div></div>
+    <div style="padding:5px 22px 24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <p style="flex:1;min-width:220px;margin:0;color:var(--muted);font-size:11px">This clears everything stored in this browser (toggles, rules, baselines, cases) and reseeds the demo data. Nothing on a real backend is affected yet.</p>
+      <button class="danger-button" id="resetBtn">Reset local data</button>
+      <button class="ghost-button" id="signOutBtn">Sign out</button>
+    </div>
+  </section>
+</div>
+
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class="" href="index.html">▣<span>Live</span></a><a class="" href="analytics.html">▥<span>Analytics</span></a><a class="" href="soar-rules.html">☷<span>SOAR</span></a><a class="" href="voice-baselines.html">◎<span>Baselines</span></a><a class="" href="forensics.html">⌕<span>Forensics</span></a><a class="active" href="account.html">♤<span>Account</span></a></nav>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+function fillForm() {
+  const a = VX.state.account;
+  document.getElementById("accName").value = a.name;
+  document.getElementById("accRole").value = a.role;
+  document.getElementById("accEmail").value = a.email;
+  document.getElementById("accOrg").value = a.org;
+  document.getElementById("toggleEmail").classList.toggle("on", a.notifEmail);
+  document.getElementById("toggleSms").classList.toggle("on", a.notifSms);
+  document.getElementById("toggleDigest").classList.toggle("on", a.notifDigest);
+  document.getElementById("toggleTheme").classList.toggle("on", a.theme === "dark");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await VX.ready();
+  fillForm();
+
+  document.getElementById("accSave").addEventListener("click", async () => {
+    const a = VX.state.account;
+    a.name = document.getElementById("accName").value.trim() || a.name;
+    a.role = document.getElementById("accRole").value.trim() || a.role;
+    a.email = document.getElementById("accEmail").value.trim() || a.email;
+    a.org = document.getElementById("accOrg").value.trim() || a.org;
+    await VX.saveAccount();
+    VX.toast("Profile updated", "success");
+  });
+
+  [["toggleEmail","notifEmail"],["toggleSms","notifSms"],["toggleDigest","notifDigest"]].forEach(([id, key]) => {
+    document.getElementById(id).addEventListener("click", async () => {
+      VX.state.account[key] = !VX.state.account[key];
+      await VX.saveAccount(); fillForm();
+    });
+  });
+
+  document.getElementById("toggleTheme").addEventListener("click", async () => {
+    VX.state.account.theme = VX.state.account.theme === "dark" ? "light" : "dark";
+    await VX.saveAccount(); VX.applyTheme(); fillForm();
+    VX.toast(`Switched to ${VX.state.account.theme} mode`);
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (confirm("Reset all VeriVox data in SQLite database?")) VX.reset();
+  });
+  document.getElementById("signOutBtn").addEventListener("click", () => {
+    VX.toast("Signed out — this is a demo, no auth is wired up yet");
+  });
+});
+</script>
+</body>
+</html>

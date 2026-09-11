@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F4072">
+  <meta name="description" content="VeriVox real-time voice intelligence dashboard">
+  <title>VeriVox · SOAR Rules</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◇</span><span>Veri<span>Vox</span></span></div>
+      <div class="workspace"><span class="avatar small">AC</span><span><small>Workspace</small><strong>Acme Corp</strong></span><span class="chevron">⌄</span></div>
+      <nav class="side-nav" aria-label="Primary navigation">
+        <p>Monitor</p><a class="nav-item" href="index.html"><span>▣</span>Live Guard<i></i></a><a class="nav-item" href="analytics.html"><span>▥</span>Analytics</a>
+        <p>Investigate</p><a class="nav-item active" href="soar-rules.html"><span>☷</span>SOAR Rules</a><a class="nav-item" href="voice-baselines.html"><span>◎</span>Voice Baselines</a><a class="nav-item" href="forensics.html"><span>⌕</span>Forensics</a>
+      </nav>
+      <div class="sidebar-bottom"><a class="nav-item" href="account.html"><span>♤</span>Account</a><a class="nav-item" href="#help"><span>?</span>Help center</a><div class="user-row"><span class="avatar">JD</span><span><strong>Jordan Davis</strong><small>Security lead</small></span><span>•••</span></div></div>
+    </aside>
+    <section class="content" id="soar">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark">◇</span><strong>VeriVox</strong></div><div class="top-actions"><span class="system-status"><i></i>All systems operational</span><button class="icon-button" aria-label="Notifications">♢<b></b></button><button class="icon-button menu-button" aria-label="Menu">☰</button><a href="account.html" class="avatar top-avatar" style="text-decoration:none;display:grid;place-items:center;color:var(--butter)">JD</a></div></header>
+      <div class="page-body">
+        <div class="page-heading"><div><div class="eyebrow"><i></i>AUTOMATION</div><h1>SOAR Rules</h1><p>Automate how VeriVox responds when risk crosses a threshold.</p></div><div class="heading-actions"><button class="primary-button" id="newRuleBtn">✦ New rule</button></div></div>
+        
+<div class="dashboard-grid" style="grid-template-columns:1fr">
+  <section class="panel"><div class="panel-header"><div><span class="section-kicker">AUTOMATION</span><h2>Active rules</h2></div><span class="more" id="ruleCount"></span></div>
+    <div class="card-list" id="ruleList" style="padding:0 22px 22px"></div>
+    <div class="empty-state" id="ruleEmpty" style="display:none"><span>☷</span>No rules yet. Create one to automate a response.</div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="ruleModal">
+  <div class="modal">
+    <h3>New SOAR rule</h3>
+    <p class="modal-sub">Runs automatically whenever a session crosses the trigger score.</p>
+    <div class="form-grid">
+      <div class="form-field full"><label>Rule name</label><input id="ruleName" placeholder="e.g. Ping fraud team on Slack"></div>
+      <div class="form-field"><label>Trigger score ≥</label><input id="ruleTrigger" type="number" min="0" max="1" step="0.01" value="0.60"></div>
+      <div class="form-field"><label>Action</label>
+        <select id="ruleAction">
+          <option value="notify">Notify security team</option>
+          <option value="case">Auto-create case</option>
+          <option value="drop">Force connection drop</option>
+          <option value="slack">Send Slack alert</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions"><button class="ghost-button" id="ruleCancel">Cancel</button><button class="primary-button" id="ruleSave">✦ Save rule</button></div>
+  </div>
+</div>
+
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class="" href="index.html">▣<span>Live</span></a><a class="" href="analytics.html">▥<span>Analytics</span></a><a class="active" href="soar-rules.html">☷<span>SOAR</span></a><a class="" href="voice-baselines.html">◎<span>Baselines</span></a><a class="" href="forensics.html">⌕<span>Forensics</span></a><a class="" href="account.html">♤<span>Account</span></a></nav>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+const ACTION_LABEL = { notify: "Notify security team", case: "Auto-create case", drop: "Force connection drop", slack: "Send Slack alert" };
+const ACTION_ICON = { notify: "!", case: "⌁", drop: "◇", slack: "☷" };
+
+function render() {
+  const list = document.getElementById("ruleList");
+  const rules = VX.state.soarRules;
+  document.getElementById("ruleCount").textContent = `${rules.length} rules`;
+  document.getElementById("ruleEmpty").style.display = rules.length ? "none" : "flex";
+  list.innerHTML = rules.map(r => `
+    <div class="list-card" data-id="${r.id}">
+      <span class="lc-icon">${ACTION_ICON[r.action] || "☷"}</span>
+      <span class="lc-body"><strong>${r.name}</strong><small>Trigger ≥ ${r.trigger.toFixed(2)} · ${ACTION_LABEL[r.action] || r.action}</small></span>
+      <span class="lc-actions">
+        <span class="toggle ${r.enabled ? "on" : ""}" data-toggle="${r.id}"><i></i></span>
+        <button class="icon-link-button" data-delete="${r.id}" aria-label="Delete rule">✕</button>
+      </span>
+    </div>`).join("");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await VX.ready();
+  render();
+
+  document.getElementById("ruleList").addEventListener("click", async (e) => {
+    const toggleId = e.target.closest("[data-toggle]")?.dataset.toggle;
+    const deleteId = e.target.closest("[data-delete]")?.dataset.delete;
+    if (toggleId) {
+      const rule = VX.state.soarRules.find(r => r.id === toggleId);
+      if (rule) {
+        rule.enabled = !rule.enabled;
+        await VX.updateSOARRule(toggleId, { enabled: rule.enabled });
+        render();
+        VX.toast(`${rule.name} ${rule.enabled ? "enabled" : "disabled"}`);
+      }
+    }
+    if (deleteId) {
+      const rule = VX.state.soarRules.find(r => r.id === deleteId);
+      if (rule) {
+        VX.state.soarRules = VX.state.soarRules.filter(r => r.id !== deleteId);
+        await VX.deleteSOARRule(deleteId);
+        render();
+        VX.toast(`Deleted "${rule.name}"`);
+      }
+    }
+  });
+
+  const modal = document.getElementById("ruleModal");
+  document.getElementById("newRuleBtn").addEventListener("click", () => modal.classList.add("open"));
+  document.getElementById("ruleCancel").addEventListener("click", () => modal.classList.remove("open"));
+  document.getElementById("ruleSave").addEventListener("click", async () => {
+    const name = document.getElementById("ruleName").value.trim();
+    if (!name) { VX.toast("Give the rule a name", "error"); return; }
+    const trigger = parseFloat(document.getElementById("ruleTrigger").value) || 0.5;
+    const action = document.getElementById("ruleAction").value;
+    const createdRule = await VX.createSOARRule({ name, trigger, action });
+    if (createdRule) {
+      VX.state.soarRules.push(createdRule);
+      render();
+      modal.classList.remove("open");
+      document.getElementById("ruleName").value = "";
+      VX.toast("Rule created", "success");
+    }
+  });
+});
+</script>
+</body>
+</html>

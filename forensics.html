@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F4072">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="VeriVox — voice intelligence, on the go">
+  <title>VeriVox · Forensics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="mobile-app">
+  <main class="app-shell">
+    <section class="content" id="forensics">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark">◇</span><strong>VeriVox</strong></div><div class="top-actions"><span class="system-status"><i></i>All systems operational</span><button class="icon-button" aria-label="Notifications">♢<b></b></button><button class="icon-button menu-button" aria-label="Menu">☰</button><a href="account.html" class="avatar top-avatar" style="text-decoration:none;display:grid;place-items:center;color:var(--butter)">JD</a></div></header>
+      <div class="page-body">
+        <div class="page-heading"><div><div class="eyebrow"><i></i>INVESTIGATION</div><h1>Forensics</h1><p>Review flagged calls and keep a record of what happened.</p></div><div class="heading-actions"></div></div>
+        
+<div class="page-toolbar">
+  <div class="filter-group" id="statusFilter">
+    <button class="filter-chip active" data-status="all">All</button>
+    <button class="filter-chip" data-status="open">Open</button>
+    <button class="filter-chip" data-status="resolved">Resolved</button>
+  </div>
+  <div class="search-input"><span>⌕</span><input id="caseSearch" placeholder="Search by caller number"></div>
+</div>
+<div class="dashboard-grid" style="grid-template-columns:1fr">
+  <section class="panel">
+    <table class="data-table">
+      <thead><tr><th>Caller</th><th>Date</th><th>Score</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody id="caseRows"></tbody>
+    </table>
+    <div class="empty-state" id="caseEmpty" style="display:none"><span>⌕</span>No cases match this filter.</div>
+  </section>
+</div>
+
+<div class="drawer-scrim" id="caseScrim"></div>
+<aside class="detail-drawer" id="caseDrawer">
+  <div class="dd-head"><div><span class="section-kicker" id="dCaller"></span><h2 id="dScore"></h2></div><button class="icon-link-button" id="dClose" aria-label="Close">✕</button></div>
+  <div class="dd-body">
+    <p style="color:var(--muted);font-size:11px" id="dMeta"></p>
+    <span class="badge" id="dStatus" style="margin-bottom:16px;display:inline-flex"></span>
+    <div style="margin-top:18px">
+      <h3 style="margin-bottom:8px">Investigation notes</h3>
+      <div id="dNotes"></div>
+      <div class="form-field full" style="margin-top:12px"><textarea id="dNoteInput" placeholder="Add a note about this call…"></textarea></div>
+      <div class="form-actions"><button class="ghost-button" id="dAddNote">Add note</button></div>
+    </div>
+    <div class="form-actions" style="justify-content:flex-start;margin-top:22px">
+      <button class="primary-button" id="dToggleStatus"></button>
+    </div>
+  </div>
+</aside>
+
+      </div>
+      <nav class="mobile-nav" aria-label="Primary navigation"><a class="" href="index.html">▣<span>Live</span></a><a class="" href="analytics.html">▥<span>Analytics</span></a><a class="" href="soar-rules.html">☷<span>SOAR</span></a><a class="" href="voice-baselines.html">◎<span>Baselines</span></a><a class="active" href="forensics.html">⌕<span>Forensics</span></a><a class="" href="account.html">♤<span>Account</span></a></nav>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+function verdictBadge(score) { return score < 0.4 ? "low" : score < 0.7 ? "mid" : "high"; }
+let activeCaseId = null;
+
+function render() {
+  const status = document.querySelector("#statusFilter .filter-chip.active").dataset.status;
+  const query = document.getElementById("caseSearch").value.trim();
+  let cases = VX.state.forensics.slice();
+  if (status !== "all") cases = cases.filter(c => c.status === status);
+  if (query) cases = cases.filter(c => c.caller.includes(query));
+
+  document.getElementById("caseEmpty").style.display = cases.length ? "none" : "flex";
+  document.getElementById("caseRows").innerHTML = cases.map(c => `
+    <tr data-id="${c.id}">
+      <td>${c.caller}</td><td>${c.date}</td><td>${c.score.toFixed(2)}</td>
+      <td><span class="badge ${c.status}">${c.status === "open" ? "Open" : "Resolved"}</span></td>
+      <td>${c.notes.length}</td>
+    </tr>`).join("");
+}
+
+function openDrawer(id) {
+  const c = VX.state.forensics.find(x => x.id === id);
+  if (!c) return;
+  activeCaseId = id;
+  document.getElementById("dCaller").textContent = c.caller;
+  document.getElementById("dScore").textContent = `Spoof score ${c.score.toFixed(2)}`;
+  document.getElementById("dMeta").textContent = c.date;
+  const statusBadge = document.getElementById("dStatus");
+  statusBadge.textContent = c.status === "open" ? "Open" : "Resolved";
+  statusBadge.className = "badge " + c.status;
+  document.getElementById("dNotes").innerHTML = c.notes.length
+    ? c.notes.map(n => `<div class="note-item">${n.text}<small>${n.time}</small></div>`).join("")
+    : `<p style="color:#9aa5b3;font-size:11px">No notes yet.</p>`;
+  const toggleBtn = document.getElementById("dToggleStatus");
+  toggleBtn.textContent = c.status === "open" ? "✓ Mark resolved" : "↺ Reopen case";
+  document.getElementById("caseDrawer").classList.add("open");
+  document.getElementById("caseScrim").classList.add("open");
+}
+
+function closeDrawer() {
+  document.getElementById("caseDrawer").classList.remove("open");
+  document.getElementById("caseScrim").classList.remove("open");
+  activeCaseId = null;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await VX.ready();
+  render();
+  document.querySelectorAll("#statusFilter .filter-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll("#statusFilter .filter-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      render();
+    });
+  });
+  document.getElementById("caseSearch").addEventListener("input", render);
+  document.getElementById("caseRows").addEventListener("click", (e) => {
+    const row = e.target.closest("tr[data-id]");
+    if (row) openDrawer(row.dataset.id);
+  });
+  document.getElementById("dClose").addEventListener("click", closeDrawer);
+  document.getElementById("caseScrim").addEventListener("click", closeDrawer);
+
+  document.getElementById("dAddNote").addEventListener("click", async () => {
+    const input = document.getElementById("dNoteInput");
+    const text = input.value.trim();
+    if (!text || !activeCaseId) return;
+    const c = VX.state.forensics.find(x => x.id === activeCaseId);
+    const timeStr = new Date().toLocaleTimeString();
+    const noteObj = { text, time: timeStr };
+    if (c) c.notes.push(noteObj);
+    await VX.addCaseNote(activeCaseId, noteObj);
+    input.value = "";
+    openDrawer(activeCaseId);
+    render();
+    VX.toast("Note added", "success");
+  });
+
+  document.getElementById("dToggleStatus").addEventListener("click", async () => {
+    const c = VX.state.forensics.find(x => x.id === activeCaseId);
+    if (!c) return;
+    c.status = c.status === "open" ? "resolved" : "open";
+    await VX.toggleCaseStatus(activeCaseId, c.status);
+    openDrawer(activeCaseId);
+    render();
+    VX.toast(c.status === "resolved" ? "Case marked resolved" : "Case reopened", "success");
+  });
+});
+</script>
+</body>
+</html>

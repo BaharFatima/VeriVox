@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1F4072">
+  <meta name="description" content="VeriVox real-time voice intelligence dashboard">
+  <title>VeriVox · Voice Baselines</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◇</span><span>Veri<span>Vox</span></span></div>
+      <div class="workspace"><span class="avatar small">AC</span><span><small>Workspace</small><strong>Acme Corp</strong></span><span class="chevron">⌄</span></div>
+      <nav class="side-nav" aria-label="Primary navigation">
+        <p>Monitor</p><a class="nav-item" href="index.html"><span>▣</span>Live Guard<i></i></a><a class="nav-item" href="analytics.html"><span>▥</span>Analytics</a>
+        <p>Investigate</p><a class="nav-item" href="soar-rules.html"><span>☷</span>SOAR Rules</a><a class="nav-item active" href="voice-baselines.html"><span>◎</span>Voice Baselines</a><a class="nav-item" href="forensics.html"><span>⌕</span>Forensics</a>
+      </nav>
+      <div class="sidebar-bottom"><a class="nav-item" href="account.html"><span>♤</span>Account</a><a class="nav-item" href="#help"><span>?</span>Help center</a><div class="user-row"><span class="avatar">JD</span><span><strong>Jordan Davis</strong><small>Security lead</small></span><span>•••</span></div></div>
+    </aside>
+    <section class="content" id="baselines">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark">◇</span><strong>VeriVox</strong></div><div class="top-actions"><span class="system-status"><i></i>All systems operational</span><button class="icon-button" aria-label="Notifications">♢<b></b></button><button class="icon-button menu-button" aria-label="Menu">☰</button><a href="account.html" class="avatar top-avatar" style="text-decoration:none;display:grid;place-items:center;color:var(--butter)">JD</a></div></header>
+      <div class="page-body">
+        <div class="page-heading"><div><div class="eyebrow"><i></i>ENROLLMENT</div><h1>Voice Baselines</h1><p>Enrolled voiceprints used to verify trusted speakers.</p></div><div class="heading-actions"><button class="primary-button" id="newBaselineBtn">✦ New baseline</button></div></div>
+        
+<div class="dashboard-grid" style="grid-template-columns:1fr">
+  <section class="panel"><div class="panel-header"><div><span class="section-kicker">VOICE BASELINES</span><h2>Enrolled speaker profiles</h2></div><span class="more" id="baselineCount"></span></div>
+    <div class="card-list" id="baselineList" style="padding:0 22px 22px"></div>
+    <div class="empty-state" id="baselineEmpty" style="display:none"><span>◎</span>No baselines yet. Create one to start verifying a speaker.</div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="baselineModal">
+  <div class="modal">
+    <h3>New voice baseline</h3>
+    <p class="modal-sub">Enroll a speaker so future calls can be verified against their voiceprint.</p>
+    <div class="form-grid">
+      <div class="form-field full"><label>Speaker name</label><input id="baselineName" placeholder="e.g. Alex Rivera"></div>
+      <div class="form-field full"><label>Context</label><input id="baselineContext" placeholder="e.g. Internal · Finance"></div>
+    </div>
+    <div class="form-actions"><button class="ghost-button" id="baselineCancel">Cancel</button><button class="primary-button" id="baselineSave">✦ Record sample &amp; save</button></div>
+  </div>
+</div>
+
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class="" href="index.html">▣<span>Live</span></a><a class="" href="analytics.html">▥<span>Analytics</span></a><a class="" href="soar-rules.html">☷<span>SOAR</span></a><a class="active" href="voice-baselines.html">◎<span>Baselines</span></a><a class="" href="forensics.html">⌕<span>Forensics</span></a><a class="" href="account.html">♤<span>Account</span></a></nav>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+function statusLabel(s) { return s === "verified" ? "Verified" : s === "processing" ? "Processing" : "Failed"; }
+
+function render() {
+  const list = document.getElementById("baselineList");
+  const items = VX.state.baselines;
+  document.getElementById("baselineCount").textContent = `${items.length} profiles`;
+  document.getElementById("baselineEmpty").style.display = items.length ? "none" : "flex";
+  list.innerHTML = items.map(b => `
+    <div class="list-card" data-id="${b.id}">
+      <span class="lc-icon">◎</span>
+      <span class="lc-body"><strong>${b.name}</strong><small>${b.speaker} · ${b.samples} samples · enrolled ${b.created}</small></span>
+      <span class="lc-actions">
+        <span class="badge ${b.status}">${statusLabel(b.status)}</span>
+        <button class="icon-link-button" data-rerecord="${b.id}" aria-label="Re-record">↻</button>
+        <button class="icon-link-button" data-delete="${b.id}" aria-label="Delete baseline">✕</button>
+      </span>
+    </div>`).join("");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await VX.ready();
+  render();
+
+  document.getElementById("baselineList").addEventListener("click", async (e) => {
+    const delId = e.target.closest("[data-delete]")?.dataset.delete;
+    const reId = e.target.closest("[data-rerecord]")?.dataset.rerecord;
+    if (delId) {
+      const b = VX.state.baselines.find(x => x.id === delId);
+      if (b) {
+        VX.state.baselines = VX.state.baselines.filter(x => x.id !== delId);
+        await VX.deleteBaseline(delId);
+        render();
+        VX.toast(`Removed baseline for ${b.name}`);
+      }
+    }
+    if (reId) {
+      const b = VX.state.baselines.find(x => x.id === reId);
+      if (b) {
+        b.status = "processing"; b.samples += 1;
+        await VX.updateBaseline(reId, { status: b.status, samples: b.samples });
+        render();
+        VX.toast(`Recording new sample for ${b.name}…`);
+        setTimeout(async () => {
+          b.status = "verified";
+          await VX.updateBaseline(reId, { status: "verified" });
+          render();
+          VX.toast(`${b.name} baseline verified`, "success");
+        }, 2200);
+      }
+    }
+  });
+
+  const modal = document.getElementById("baselineModal");
+  function openModal() { modal.classList.add("open"); }
+  document.getElementById("newBaselineBtn").addEventListener("click", openModal);
+  document.getElementById("baselineCancel").addEventListener("click", () => modal.classList.remove("open"));
+  document.getElementById("baselineSave").addEventListener("click", async () => {
+    const name = document.getElementById("baselineName").value.trim();
+    if (!name) { VX.toast("Give the speaker a name", "error"); return; }
+    const speaker = document.getElementById("baselineContext").value.trim() || "Uncategorized";
+    const entry = await VX.createBaseline({ name, speaker });
+    if (entry) {
+      VX.state.baselines.unshift(entry);
+      render();
+      modal.classList.remove("open");
+      document.getElementById("baselineName").value = "";
+      document.getElementById("baselineContext").value = "";
+      VX.toast("Recording sample…");
+      setTimeout(async () => {
+        entry.status = "verified";
+        await VX.updateBaseline(entry.id, { status: "verified" });
+        render();
+        VX.toast(`${entry.name} baseline verified`, "success");
+      }, 2400);
+    }
+  });
+
+  if (new URLSearchParams(location.search).get("new") === "1") openModal();
+});
+</script>
+</body>
+</html>
